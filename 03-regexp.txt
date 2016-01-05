@@ -20,7 +20,7 @@
 /abc$/ matches last 3 characters in a line.
 
 @@
-4. CHARACTER CLASSES [].
+4. CHARACTER CLASSES - GROUPS OF CHARACTER REFERENCED IN SQUARE BRACKETS [].
 
 /a[xyz]c/ matches 'axc'
 
@@ -46,9 +46,51 @@ REPEATING MULTIPLE ITEMS
 
 In other words, the asterisk refers to the sequence of characters in parentheses, 'ab'.
 
-GREEDINESS
+@@
+5. GREEDINESS - USING THE ASTERISK
 
 /<.*>/ matches all of "<i>italic text</i>"
 
 /<[^>]*^> matches the "italic text" only.
+
+@@
+6. AMPERSAND & - REFERS TO A MATCH IN A REPLACEMENT STRING
+
+We can refer to the match we've just found and are about to replace with an ampersand. For example, here we put every capitalized word in a text in parentheses:
+
+$ sed 's/[A-Z][a-z]*/(&)/g' dukeofyork.txt 
+                      ^--- OUR MATCH, WE SURROUND IT WITH PARENTHESES HERE
+
+(The) grand old (Duke) of (York)
+(He) had ten thousand men
+(He) marched them up to the top of the hill
+(And) he marched them down again
+(And) when they were up they were up
+(And) when they were down they were down
+(And) when they were only half-way up
+(They) were neither up nor down
+
+
+@@
+7. BACKSLASH-NUMBER - REFERS TO AN INDIVIDUAL SUBSTRING IN A MATCH
+
+sed 's/\([A-Za-z]*\) *\(up\)/<\1> <\2>/g' dukeofyork.txt 
+       ^^---------^^  ^^--^^  ^^   ^^
+            |           |     |     |
+            \-----------/     \-----/
+                  |              |
+             CAPTURE GROUPS    REFERENCED IN THE REPLACEMENT STRING AS \1 and \2
+
+Capture groups are marked with parentheses in the search pattern, and parentheses must be escaped, hence the \(pattern\) syntax.
+
+THE RESULT:
+
+The grand old Duke of York
+He had ten thousand men
+He marched <them> <up> to the top of the hill
+And he marched them down again
+And when they <were> <up> they <were> <up>
+And when they were down they were down
+And when they were only half-<way> <up>
+They were <neither> <up> nor down
 

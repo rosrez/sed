@@ -1,0 +1,100 @@
+@@
+1. COMMANDS AND FILENAMES ON THE COMMAND LINE.
+
+sed interprets the first string on the command line as the command and the second string as a filename to operate on.
+
+sed 's/the/THE/' dukeofyourk.txt
+     ^^^^^^^^^^  ^^^^^^^^^^^^^^^
+         |              |
+      COMMAND       FILENAME
+
+To specify multiple commands to apply to the same file, use the -e flag. A string that appears after the -e flag is treated as a command, so in case of multiple commands, each command should be preceded with -e, as in this example:
+
+$ sed -e 's/up/UP/' -e 's/down/DOWN/' dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them UP to the top of the hill
+And he marched them DOWN again
+And when they were UP they were up
+And when they were DOWN they were down
+And when they were only half-way UP
+They were neither UP nor DOWN
+
+All commands are executed, in order. This may help to avoid awkward situations:
+
+$ sed -e 's/them/HIM/g' -e 's/they were/HE WAS/g' -e 's/the/THE/' dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched HIM up to THE top of the hill
+And he marched HIM down again
+And when HE WAS up HE WAS up
+And when HE WAS down HE WAS down
+And when HE WAS only half-way up
+They were neiTHEr up nor down
+
+The order of the commands is important, since the second command operates on the result of the first command, the third operates on the result of the second, and so on. If the change of 'the' to 'THE' was specified first, the changed strings 'them' or 'they' would not match the 'the' pattern anymore.
+
+@@
+2. SED SCRIPTS: -f option
+
+We can put sed commands in a script, like this:
+
+$ cat > script 
+s/up/UP/g
+s/down/DOWN/g
+^D
+
+Now, we can run the script against a file, like so:
+
+$ sed -f script dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them UP to the top of the hill
+And he marched them DOWN again
+And when they were UP they were UP
+And when they were DOWN they were DOWN
+And when they were only half-way UP
+They were neither UP nor DOWN
+
+Putting the commands in a script is equivalent to invoking them with -e options.
+
+@@
+3. CONTROLLING PRINTING.
+
+-n tells sed not to print anything
+
+p tells sed to print the current line, i.e. it can be used as a modifier to the replacement command.
+
+EXAMPLE
+
+1) Replace 'the' with 'THE':
+
+$ sed 's/the/THE/' dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched THEm up to the top of the hill
+And he marched THEm down again
+And when THEy were up they were up
+And when THEy were down they were down
+And when THEy were only half-way up
+They were neiTHEr up nor down
+
+This prints everything, including the lines that have not been changed by sed.
+
+2) If we specify the -n option, sed doesn't print anything:
+
+$ sed -n 's/the/THE/' dukeofyork.txt 
+$ 
+
+3) If we specify p as a modifier to the replace command, sed will output the lines that it is changing (i.e. wherever the match occurs):
+
+$ sed -n 's/the/THE/p' dukeofyork.txt 
+He marched THEm up to the top of the hill
+And he marched THEm down again
+And when THEy were up they were up
+And when THEy were down they were down
+And when THEy were only half-way up
+They were neiTHEr up nor down
+
+NOTE: 'p' can be combined with the 'g' (global) modifier, either as s/old/new/pg or s/old/new/gp.
+

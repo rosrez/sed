@@ -1,0 +1,117 @@
+@@
+1. p PRINT a line
+
+EXAMPLE:
+
+$ sed p dukeofyork.txt 
+The grand old Duke of York  <--- LINE IS PRINTED BY DEFAULT
+The grand old Duke of York  <--- LINE IS PRINTED BECAUSE p WAS SPECIFIED
+He had ten thousand men
+He had ten thousand men
+He marched them up to the top of the hill
+He marched them up to the top of the hill
+And he marched them down again
+And he marched them down again
+And when they were up they were up
+And when they were up they were up
+And when they were down they were down
+And when they were down they were down
+And when they were only half-way up
+And when they were only half-way up
+They were neither up nor down
+They were neither up nor down
+
+$ sed -n p dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+NO MORE PRINTING BY DEFAULT, BUT EACH LINE IS PRINTED ONCE BECAUSE WE USED THE p COMMAND.
+
+@@
+2. p CAN BE COMBINED WITH ADDRESSES:
+
+$ sed -n 3p dukeofyork.txt      ----- PRINTS LINE 3
+He marched them up to the top of the hill
+
+$ sed -n '$p' dukeofyork.txt    ------ $ STANDS FOR THE LAST LINE OF THE FILE
+They were neither up nor down
+
+sed -n '1,3p' dukeofyork.txt    ------ LINES 1 TO 3
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+
+@@
+3. ADDRESS CAN BE A REGULAR EXPRESSION
+
+EXAMPLE:
+
+$ sed -n '/down/p' dukeofyork.txt 
+And he marched them down again
+And when they were down they were down
+They were neither up nor down
+
+Only lines that contain 'down' are printed.
+
+@@
+4. WE CAN SPECIFY PATTERN RANGES AS ADDRESSES FOR COMMANDS
+
+$ nl dukeofyork.txt 
+     1  The grand old Duke of York
+     2  He had ten thousand men
+     3  He marched them up to the top of the hill
+     4  And he marched them down again
+     5  And when they were up they were up
+     6  And when they were down they were down
+     7  And when they were only half-way up
+     8  They were neither up nor down
+
+$ nl dukeofyork.txt | sed -n '/marched/,/when/p'
+     3  He marched them up to the top of the hill    <---- FIRST OCCURRENCE OF 1st EXPRESSION
+     4  And he marched them down again
+     5  And when they were up they were up           <---- FIRST OCCURRENCE OF 2nd PATTERN AFTER THE FIRST
+
+NOTE: if both patterns match on the same line, the second pattern is ignored and the command is repeated until another match of the 2nd pattern is found or sed runs out of file:
+
+$ nl dukeofyork.txt | sed -n '/hill/,/up/p'
+     3  He marched them up to the top of the hill    <--- 'up' is ignored here
+     4  And he marched them down again
+     5  And when they were up they were up           <--- the search for the 2nd pattern (and printing) continues until this line
+
+@@
+5. WE CAN MIX LINE NUMBERS AND REGULAR EXPRESSION
+
+nl dukeofyork.txt | sed -n '2,/down/p'
+     2  He had ten thousand men
+     3  He marched them up to the top of the hill
+     4  And he marched them down again
+
+This starts printing at line 2 and continues until 'down' is found.
+
+@@
+6. NEGATING AN ADDRESS - THE EXCLAMATION MARK !
+
+This prints lines 2 to 5 of the sample file:
+
+$ nl dukeofyork.txt | sed -n '2,5p'
+     2  He had ten thousand men
+     3  He marched them up to the top of the hill
+     4  And he marched them down again
+     5  And when they were up they were up
+
+And this prints lines of the sample file outside the range 2,5:
+
+$ nl dukeofyork.txt | sed -n '2,5!p'
+                                 ^ -- EXCLAMATION MARK, REVERSES THE SENSE OF AN ADDRESS
+
+     1  The grand old Duke of York
+     6  And when they were down they were down
+     7  And when they were only half-way up
+     8  They were neither up nor down
+
