@@ -1,0 +1,54 @@
+@@
+1. SED REGULAR EXPRESSIONS.
+
+/abc/ matches abc
+
+@@
+2. ESCAPE CHARACTER \
+
+/a\.c/ matches 'a.c'
+
+/a\\c/ maches 'a\c'
+
+/a\/c/ matches 'a/c'
+
+@@
+3. BEGINNING/END OF LINE.
+
+/^abc/ matches first 3 characters in the line 'abcd'
+
+/abc$/ matches last 3 characters in a line.
+
+@@
+4. CHARACTER CLASSES [].
+
+/a[xyz]c/ matches 'axc'
+
+/a[xyz]c/ does not match "axyzc"
+
+/a[a-z]c/ matches "abc" or "aBc"
+
+/a[a-zA-Z]c/ matches "abc"
+
+/a[^a-z]c/ does not match "Abc"
+   ^^^^
+   NEGATION with ^: ANYTHING THAT IS NOT A LOWER-CASE LETTER
+
+/ab*c/ matches "ac", "abc", "abbbbbbbbbbc"
+
+REPEATING MULTIPLE ITEMS
+
+/ab*c/  matches "abbbbbbc". The asterisk here refers to the 'b' character in the pattern.
+
+/(ab)*c/ matches "ababababababc"
+                  ^^
+                  PART OF PATTERN REPEATS
+
+In other words, the asterisk refers to the sequence of characters in parentheses, 'ab'.
+
+GREEDINESS
+
+/<.*>/ matches all of "<i>italic text</i>"
+
+/<[^>]*^> matches the "italic text" only.
+

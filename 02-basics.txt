@@ -1,0 +1,39 @@
+@@
+1. THE 'SUBSTITUTE' COMMAND
+
+In its most basic form, the command looks like this:
+
+s/old/new/
+
+'old' is a text to replace with 'new'.
+
+EXAMPLE
+
+sed 's/the/THE/' dukeofyork.txt 
+
+
+The grand old Duke of York
+^^^
+Mixed small letters and a capital, not caught by the command
+
+He had ten thousand men
+He marched THEm up to the top of the hill
+                                 ^^^
+                                 Second occurrence not caught, global modifier is not specified.
+And he marched THEm down again
+And when THEy were up they were up
+And when THEy were down they were down
+And when THEy were only half-way up
+They were neiTHEr up nor down
+
+@@
+2. THE GLOBAL MODIFIER
+
+Affects every occurrence of a pattern in a string.
+
+@@
+3. REFERENCING THE Nth OCCURRENCE
+
+sed 's/the/THE/2' dukeofyork.txt
+
+The /2 modifier at the end of the substitute command tells sed to replace only the second match within a line.
