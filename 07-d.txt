@@ -1,0 +1,44 @@
+@@
+1. The 'd' (delete) command may be combined with address ranges, just as the 'p' (print) command can.
+
+EXAMPLE 1 - DELETE A SPECIFIC LINE NUMBER (NUMBERS)
+
+$ nl dukeofyork.txt | sed '4d'
+     1  The grand old Duke of York
+     2  He had ten thousand men
+     3  He marched them up to the top of the hill
+     5  And when they were up they were up
+     6  And when they were down they were down
+     7  And when they were only half-way up
+     8  They were neither up nor down
+
+This deletes the 4th line.
+
+EXAMPLE 2 - A RANGE OF PATTERNS
+
+$ nl dukeofyork.txt | sed '/thousand/,/down/d'
+     1  The grand old Duke of York
+     5  And when they were up they were up
+     6  And when they were down they were down
+     7  And when they were only half-way up
+     8  They were neither up nor down
+
+This deletes everything between the pattern 'thousand' and 'down', inclusive.
+
+@@
+2. DELETE AND THE EXCLAMATION POINT MODIFIER
+
+The delete command is often used with the exclamation mark modifier.
+
+$ nl dukeofyork.txt | sed '/up/d'
+     1  The grand old Duke of York
+     2  He had ten thousand men
+     4  And he marched them down again
+     6  And when they were down they were down
+
+$ nl dukeofyork.txt | sed '2,4!d'
+     2  He had ten thousand men
+     3  He marched them up to the top of the hill
+     4  And he marched them down again
+
+

@@ -1,0 +1,139 @@
+@@
+1. 'r' (READ FILE) SYNTAX
+
+The 'r' command reads in the contents of another file. It can be combined with an exact address (a line number, a pattern match, or $ - end of input marker), but not with a range of addresses.
+
+EXAMPLE.
+
+1) Create a file 'haha' with the following line in it:
+
+$ cat > haha
+==> HAHA HE SAID "DOWN"
+
+$ sed '/down/r haha' dukeofyork.txt <---- WHENEVER A LINE WITH 'down' OCCURS, READ IN THE 'haha' FILE
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again              <--- 1st occurrence of 'down'
+==> HAHA HE SAID "DOWN"                     <--- 1st insertion of the file (r command)
+And when they were up they were up
+And when they were down they were down      <--- 2nd occurrence of 'down'
+==> HAHA HE SAID "DOWN"                     <--- 2nd insertion of the file (r command)
+And when they were only half-way up
+They were neither up nor down               <--- 3rd occurrence of 'down'
+==> HAHA HE SAID "DOWN"                     <--- 3rd insertion of the file (r command)
+
+@@
+2. 'w' (WRITE TO FILE) SYNTAX
+
+$ sed '1,3w top' dukeofyork.txt   <--- WILL WRITE LINES 1-3 TO THE FILE NAMED 'top'
+The grand old Duke of York        <--- THIS COMMAND STILL PRINTS LINES OF THE FILE, SINCE THIS IS THE DEFAULT BEHAVIOUR
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+The contents of the output file ('top') look as expected
+
+$ cat top 
+The grand old Duke of York          <--- LINES 1-3 FROM THE ORIGINAL FILE.
+He had ten thousand men
+He marched them up to the top of the hill
+
+@@
+3. 'w' MODIFIER
+
+This modifier can be specified in addition to the substitute command to write only the changed lines to a specified file.
+
+EXAMPLE.
+
+$ sed 's/up/UP/w up' dukeofyork.txt 
+The grand old Duke of York                  <--- THIS IS THE ENTIRE INPUT FILE, MODIFIED WHERE APPROPRIATE
+He had ten thousand men
+He marched them UP to the top of the hill
+And he marched them down again
+And when they were UP they were up
+And when they were down they were down
+And when they were only half-way UP
+They were neither UP nor down
+
+The 'up' file now contains only the lines that were actually changed:
+
+$ cat up
+He marched them UP to the top of the hill
+And when they were UP they were up
+And when they were only half-way UP
+They were neither UP nor down
+
+@@
+4. THE 'w' COMMAND IS EXECUTED IMMEDIATELY WHEN A MATCH OCCURS.
+
+Suppose we want to write every line containing 'down' to a file named 'down' and also replace 'up' with 'UP'. We do this with multiple -e command line options. We see that the replacement was written to standard output as we expected.
+
+$ sed -e '/down/w down' -e 's/up/UP/' dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them UP to the top of the hill
+And he marched them down again
+And when they were UP they were up
+And when they were down they were down
+And when they were only half-way UP
+They were neither UP nor down
+
+But the output file 'down' doesn't contain the results of the substitution. The reason is that the lines had been written to 'down' BEFORE the substitution took place.
+
+$ cat down 
+And he marched them down again
+And when they were down they were down
+They were neither up nor down
+
+If we reverse the order of the -e options, we see the result of the substitutions in the output file:
+
+ed -e 's/up/UP/' -e '/down/w down' dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them UP to the top of the hill
+And he marched them down again
+And when they were UP they were up
+And when they were down they were down
+And when they were only half-way UP
+They were neither UP nor down
+
+$ cat down 
+And he marched them down again
+And when they were down they were down
+They were neither UP nor down
+
+@@
+5. THE 'w' COMMAND GETS INVOKED AFTER EACH MATCH
+
+$ sed -e 's/up/UP/w out' -e 's/down/DOWN/w out' dukeofyork.txt 
+                  ^^^^^                  ^^^^
+                    |                     |
+A LINE GETS ADDED TO 'out' UPON EACH MATCH
+
+The grand old Duke of York
+He had ten thousand men
+He marched them UP to the top of the hill
+And he marched them DOWN again
+And when they were UP they were up
+And when they were DOWN they were down
+And when they were only half-way UP
+They were neither UP nor DOWN
+
+$ cat out
+He marched them UP to the top of the hill
+And he marched them DOWN again
+And when they were UP they were up
+And when they were DOWN they were down
+And when they were only half-way UP
+They were neither UP nor down       <---- WRITTEN AFTER 'up' WAS REPLACED
+They were neither UP nor DOWN       <---- WRITTEN AFTER 'down' WAS REPLACED
+
+@@
+6. THE 'w' COMMAND AND FILE CREATION
+
+The command creates the file if it doesn't exist (even if no matches are found in sed's input!). If the file does exist prior to invocation of sed, the file gets truncated.
