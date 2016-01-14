@@ -1,0 +1,18 @@
+@@
+1. 'y' COMMAND - CHARACTER TO CHARACTER REPLACEMENT.
+
+The command is similar to the UNIX 'tr' command. The command takes two strings:
+
+y/12345/67890/
+
+12345 - if input contains one of the characters in the first string (1,2,3,4 or 5 in our case), the matching character is replaced with the character at the same position from the second string (sed replaces 1 with 6, 2 with 7, and so on).
+
+@@
+2. IMPOSSIBLE TO SUBSTITUTE CHARACTER RANGES.
+
+The command does not support character ranges.
+
+@@
+3. SPECIAL CHARACTERS
+
+We can substitute input with special characters like \n, etc.
