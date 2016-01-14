@@ -1,0 +1,126 @@
+@@
+1. 'a' COMMAND
+
+The line expects
+<--- The backslash escapes the newline character (there must be no characters between / and the newline)
+
+EXAMPLE 1 - INSERT A LINE AFTER THE WORD 'down'
+
+$ sed '/down/ a\
+> ==> HAHA HE SAID "DOWN"    <---- This newline marks a newline, this final newline need not be escaped
+>  ' dukeofyork.txt         
+
+
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again
+==> HAHA HE SAID "DOWN"
+And when they were up they were up
+And when they were down they were down
+==> HAHA HE SAID "DOWN"
+And when they were only half-way up
+They were neither up nor down
+==> HAHA HE SAID "DOWN"
+
+-------------------
+
+EXAMPLE 2 - INSERT TWO LINES AFTER THE WORD 'down'
+
+Again, we escape the newline after the a command, but also the subsequent line. Only the final newline need not be escaped.
+
+$ sed '/down/ a\
+> ==> HAHA\
+> ==> HE SAID "DOWN"
+> ' dukeofyork.txt
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again
+==> HAHA
+==> HE SAID "DOWN"
+And when they were up they were up
+And when they were down they were down
+==> HAHA
+==> HE SAID "DOWN"
+And when they were only half-way up
+They were neither up nor down
+==> HAHA
+==> HE SAID "DOWN"
+
+--------------
+
+EXAMPLE 3 - APPEND A BLANK LINE AFTER EVERY LINE IN A FILE
+
+$ sed 'a\
+> ' dukeofyork.txt
+The grand old Duke of York
+
+He had ten thousand men
+
+He marched them up to the top of the hill
+
+And he marched them down again
+
+And when they were up they were up
+
+And when they were down they were down
+
+And when they were only half-way up
+
+They were neither up nor down
+
+<EOF>
+
+------------
+
+@@ i
+
+2. 'i' - INSERT (BEFORE A MATCH)
+
+'i' is exactly the same as 'a', except it inserts a line before the matching line.
+
+EXAMPLE:
+
+$ cat i-command.sed 
+/again/ i\
+==> HE'S ABOUT TO SAY "AGAIN"
+/again/ a\
+==> HE SAID "AGAIN"
+
+<EOF>
+
+$ sed -f i-command.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+==> HE'S ABOUT TO SAY "AGAIN"                   <--- THE RESULT OF THE 'i' COMMAND
+And he marched them down again
+==> HE SAID "AGAIN"                             <--- THE RESULT OF THE 'a' COMMAND
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+------------
+
+@@
+3. 'c' - CHANGE LINE(S) 
+
+This command can accept a range. This line replaces a line or a range of lines with new text.
+
+$ sed '/top/,/again/ c\
+> He treated them inconsistently\
+> And their moods were variable
+> ' dukeofyork.txt
+The grand old Duke of York
+He had ten thousand men
+He treated them inconsistently            <--- NEW TEXT
+And their moods were variable             <--- NEW TEXT
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+
+
