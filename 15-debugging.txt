@@ -1,0 +1,96 @@
+@@
+1. POUND SIGN # <--> COMMENT.
+
+The poind sign (#) at the beginning of a line is treated as a comment. It may be preceded by leading whitespace which is ignored.
+
+@@
+2. = PRINTS THE CURRENT LINE NUMBER
+
+$ cat print-line-number1.sed 
+/marched/ {
+    n
+    =           <--- PRINT THE LINE NUMBER WHEN WE FIRST ADVANCE TO THE NEXT LINE
+    s/^/((/
+    n
+    =           <--- PRINT THE LINE NUMBER WHEN WE ADVANCE AGAIN
+    s/$/))/
+    =           <--- PRINT THE LINE NUMBER TO SEE THAT IT HAS REMAINED THE SAME AFTER THE PREVIOUS COMMAND
+}
+
+ed -f print-line-number1.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+4
+((And he marched them down again        <--- THIS IS LINE 4 (WE ADVANCE FOR THE 1st TIME)
+5                                       <--- THIS IS LINE 5 (WE ADVANCE FOR THE 2nd TIME)
+5                                       <--- LINE 5 AGAIN: WE HAVEN'T ADVANCED AFTER THE SUBSTITUTION YET
+And when they were up they were up))    <--- CURLY BRACE ENDS, PRINT LINE 5
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+@@
+3. l - PRINTS THE LINE NUMBER, A $ CHARACTER AT THE END, AND ANY NON-PRINTING CHARACTERS ARE REPLACED WITH ESCAPE SEQUENCES
+
+EXAMPLE
+
+Suppose we have a script that changes the 3rd space in a line to a tab. The script looks like this:
+
+$ cat space-to-tab.sed 
+# Replaces the 3rd space in a line to a tab
+
+s/ /    /3
+
+If we run it on our file, we get this output:
+
+$ sed -f space-to-tab.sed dukeofyork.txt 
+The grand old   Duke of York
+He had ten  thousand men
+He marched them up to the top of the hill  <--- WE DON'T SEE EXACTLY WHERE THE TAB WENT
+And he marched  them down again
+And when they   were up they were up
+And when they   were down they were down
+And when they   were only half-way up
+They were neither   up nor down
+
+If we add the l command after the s command, like so:
+
+$ cat space-to-tab.sed 
+# Replaces the 3rd space in a line to a tab
+
+s/ /    /3
+l
+
+we get this:
+
+$ sed -f space-to-tab.sed dukeofyork.txt 
+The grand old\tDuke of York$
+The grand old   Duke of York
+He had ten\tthousand men$
+He had ten  thousand men
+He marched them\tup to the top of the hill$
+He marched them up to the top of the hill
+And he marched\tthem down again$
+And he marched  them down again
+And when they\twere up they were up$
+And when they   were up they were up
+And when they\twere down they were down$
+And when they   were down they were down
+And when they\twere only half-way up$
+And when they   were only half-way up
+They were neither\tup nor down$
+They were neither   up nor down
+
+You can also suppress the default output with the -n argument to sed:
+
+$ sed -nf space-to-tab.sed dukeofyork.txt 
+The grand old\tDuke of York$
+He had ten\tthousand men$
+He marched them\tup to the top of the hill$
+And he marched\tthem down again$
+And when they\twere up they were up$
+And when they\twere down they were down$
+And when they\twere only half-way up$
+They were neither\tup nor down$
+

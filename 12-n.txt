@@ -1,0 +1,29 @@
+@@
+1. 'n' COMMAND - PRINT A LINE AND GET THE NEXT LINE
+
+The command prints the current line, including any modifications made to it by previous commands, and gets the next line.
+
+Combined with the sed flag -n, the command just gets the next line. This is most useful in sed scripts with command blocks. Commands in a block are executed in order, and only after that a line is printed. The 'n' command can be used within a block to perform commands on lines AFTER A GIVEN ADDRESS.
+
+EXAMPLE
+This script encloses two lines following a line that contains 'marched' in double parentheses.
+
+$ cat braces-after-marched.sed 
+/marched/ {
+    n           # print the current line (containing 'marched') and advance to the next line
+    s/^/((/     # replace the beginning of line with ((
+    n           # print the previous (modified) line and advance to the next one
+    s/$/))/     # replace the end of line with ))
+}
+
+ed -f n.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+((And he marched them down again            <-- THIS LINE ALSO CONTAINS 'marched', but the 'n' command ate it up.
+And when they were up they were up))
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+The second line with the word 'marched' was processed by the n command so it was no longer part of the matching.

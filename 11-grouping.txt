@@ -1,0 +1,84 @@
+@@
+1. GROUPING COMMANDS WITH BRACES
+
+Each brace must appear on a line by itself. The open curly brace can be preceded by an address or range on the same line. The closing brace must appear on a line by itself
+
+EXAMPLE 1
+Changes 'up' to 'UP' and 'down' to 'DOWN' only on lines that contain the word 'when'
+
+VERSION 1
+
+$ cat uppercase2.sed
+# Changes 'up' to 'UP' and 'down' to 'DOWN' only on lines that contain the word 'when'
+/when/ s/up/UP/g
+/when/ s/down/DOWN/g
+
+VERSION 2 - achieves the same effect, but is more maintainable
+
+$ cat uppercase3.sed
+# A more elegant way to change 'up' to 'UP' and 'down' to 'DOWN' only on lines that contain the word 'when'
+# Compare this script to uppercase2.sed where each command is preceded by its own address range.
+# Note that sed ignores whitespace at the beginning of a command line. You can see that the block in curly braces is indented.
+/when/ {
+    s/up/UP/g          
+    s/down/DOWN/g
+}
+
+$ sed -f uppercase3.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again
+And when they were UP they were UP          <--- CHANGES MADE ONLY ON LINES CONTAINING 'when'
+And when they were DOWN they were DOWN      <--- CHANGES MADE ONLY ON LINES CONTAINING 'when'
+And when they were only half-way UP         <--- CHANGES MADE ONLY ON LINES CONTAINING 'when'
+They were neither up nor down
+
+@@
+2. ADDRESS/RANGE NEGATION CAN BE APPLIED TO BLOCKS
+
+$ cat uppercase4.sed
+# Negation combined with a block in curly braces:
+# change 'up' to 'UP' and 'down' to 'DOWN' only on lines that DO NOT contain the word 'when'
+# Compare this script to uppercase3.sed 
+/when/ ! {
+    s/up/UP/g          
+    s/down/DOWN/g
+}
+
+$ sed -f uppercase4.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them UP to the top of the hill     <-- CHANGES MADE ONLY ON LINES THAT DON'T CONTAIN 'when'
+And he marched them DOWN again                <-- CHANGES MADE ONLY ON LINES THAT DON'T CONTAIN 'when'
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither UP nor DOWN                 <-- CHANGES MADE ONLY ON LINES THAT DON'T CONTAIN 'when'
+
+@@
+3. BLOCKS CAN BE NESTED
+
+EXAMPLE
+
+$ cat uppercase5.sed 
+# change 'up' to 'UP' and 'down' to 'DOWN' only on lines 3,6 that contain the word 'when'
+# Illustrates nested blocks 
+
+3,6 {
+    /when/ {
+        s/up/UP/g          
+        s/down/DOWN/g
+    }
+}
+
+$ nl dukeofyork.txt | sed -f uppercase5.sed
+     1  The grand old Duke of York
+     2  He had ten thousand men
+     3  He marched them up to the top of the hill
+     4  And he marched them down again
+     5  And when they were UP they were UP          <--- RANGE 3,6 & CONTAINS 'when'
+     6  And when they were DOWN they were DOWN      <--- RANGE 3,6 & CONTAINS 'when'
+     7  And when they were only half-way up
+     8  They were neither up nor down
+

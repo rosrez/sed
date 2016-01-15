@@ -1,0 +1,13 @@
+@@
+1. 'd' COMMAND - ABORT PROCESSING FOR THE CURRENT LINE
+
+EXAMPLE
+
+$ cat d.sed 
+/up/ {
+    s/up/UP/
+    d
+    s/^/==/
+}
+
+This script simply deletes any lines containing 'up'. The reason is that after the first substitution, the line gets deleted and the second substitution (and subsequent printing) never takes place.

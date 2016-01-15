@@ -1,0 +1,34 @@
+@@
+1. THE 'q' COMMAND - QUIT PROCESSING IF A CONDITION IS MET
+
+The command prints the current line and sed then quits further processing immediately.
+
+EXAMPLE 1
+
+$ sed '/again/q' dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+And he marched them down again
+
+EXAMPLE 2
+
+Do a complex replacement (see section 11) and quit.
+
+$ cat braces-after-marched-and-quit.sed 
+/marched/ {
+    n
+    s/^/((/
+    n
+    s/$/))/
+    q
+}
+
+$ sed -f braces-after-marched-and-quit.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill
+((And he marched them down again        <--- REPLACED LINE AFTER THE MATCH
+And when they were up they were up))    <--- REPLACED LINE AFTER THE MATCH
+                                        <--- QUIT HERE, WE RELY ON THE /marched/ PATTERN TO IDENTIFY THIS LOCATION
+
