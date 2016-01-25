@@ -1,0 +1,120 @@
+@@
+1. THE 'N' COMMAND
+
+The command reads the next line into the pattern space.
+
+EXAMPLE. 
+
+On lines containing 'marched', read the next line and append it to the pattern space
+(now there are two lines in the pattern space) and replace the newline with ' - '.
+
+marched/ {
+    N
+    s/\n/ - /
+}
+
+The result is:
+
+$ sed -f replace-newline-after-marched.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched them up to the top of the hill - And he marched them down again
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+NOTE that after N takes effect in this example, the pattern space looks like this:
+
+He marched them up to the top of the hill\nAnd he marched them down again
+                                         ^^   --- ONE NEWLINE
+
+This newline character is replaced by the subsequent s command.
+
+@@
+2. THE 'P' COMMAND.
+
+The command prints the contents of the pattern space up to the first newline.
+
+@@
+3. THE 'D' COMMAND.
+
+The command deletes the contents of the pattern space up to the first newline.
+
+EXAMPLE.
+
+Create a script that replaces a sequence marched (words) up with marched...up,
+even if the sequence spans two lines.
+
+ATTEMPT 1.
+
+$ cat replace-marched-up-naive.sed 
+# read the next line
+N
+# replace with shorter version
+s/marched.*up/marched...up/
+
+$ sed -f replace-marched-up-naive.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched...up to the top of the hill      <--- SINGLE LINE MATCH WORKS AS EXPECTED
+And he marched them down again              <--- THIS HAS BEEN EATEN BY THE 'N' COMMAND SO IT ISN'T MATCHED FOR PATTERN
+And when they were up they were up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+ATTEMPT 2.
+
+$ cat replace-marched-up.sed 
+# Grab the next line
+N
+# replace (possibly a multiline pattern match) with marched...up.
+s/marched.*up/marched...up/
+# print the first line of the pattern space
+P
+# delete the first line of the pattern space:
+D
+
+This script works as expected:
+
+$ sed -f replace-marched-up.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched...up to the top of the hill
+And he marched...up
+And when they were down they were down
+And when they were only half-way up
+They were neither up nor down
+
+This is how this works.
+
+1) First occurrence of 'marched':
+
+He marched them up to the top of the hill
+
+2) N - append the next line, pattern space is now:
+
+He marched them up to the top of the hill\nAnd he marched them down again
+
+3) Replaced the FIRST match in the pattern space:
+
+He marched< them >up to the top of the hill\nAnd he marched them down again
+
+4) Print/Delete the first line from the pattern space, the pattern space is:
+
+And he marched them down again
+
+5) Check for match - TRUE
+
+6) Get the next line, the pattern space now is
+
+And he marched them down again\nAnd when they were up they were up
+
+7) Replace the pattern:
+
+And he marched< them down again\nAnd when they were up they were >up
+
+8) Print the first (and only, this time) line and delete the first line.
+
+9) The pattern space is now empty and we proceed normally to the next line.

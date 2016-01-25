@@ -1,0 +1,12 @@
+@@
+1. HOW SED WORKS
+
+1) Read line from input into pattern space.
+
+2) Examine all commands in script to see which apply.
+
+3) Execute applicable commands in order.
+
+4) Print pattern space (unless -n is in effect).
+
+
