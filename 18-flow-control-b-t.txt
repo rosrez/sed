@@ -1,0 +1,71 @@
+@@
+1. LABELS
+
+A label can be defined with a colon followed by a string of ASCII characters (spaces are ignored):
+
+: label
+
+@@
+2. THE 'b' COMMAND -- BRANCH TO LABEL
+
+in order to go to a label, possibly skipping some commands in between, use 'b label'.
+
+EXAMPLE
+
+$ cat skip-commands.sed 
+s/the/THE/g
+# jumps to the 'next' label, i.e. skips over the next command
+b next
+# this never gets executed
+s/up/UP/
+: next
+s/down/DOWN/g
+# branches to the end of the file, i.e. skips over subsequent commands
+b
+# this, again, never gets executed
+s/marched/MARCHEd/g
+
+Results in this output:
+
+$ sed -f skip-commands.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched THEm up to THE top of THE hill
+And he marched THEm DOWN again
+And when THEy were up THEy were up
+And when THEy were DOWN THEy were DOWN
+And when THEy were only half-way up
+They were neiTHEr up nor DOWN
+
+Replacements for 'up' and 'marched' never get executed because the b commands skip over them.
+
+@@
+3. THE 't' COMMAND -- TEST FOR SUBSTITUTION AND IF TRUE, BRANCH TO LABEL.
+
+'t label' branches to a label, but only if any text has been substituted on the current line. This includes any match, even if the substituted text is identical to the original one.
+
+EXAMPLE.
+
+$ cat conditional-branch.sed 
+# replaces 'again' with itself, but lets us know if the pattern matched
+s/again/again/
+# if there has been a substitution (i.e. the line contains 'again'), branch to label
+t label
+# this gets executed only if we don't have a match, i.e. there's no word 'again' in the line.
+s/the/THE/g
+: label
+# Executed unconditionally
+s/up/UP/g
+
+This scripts results in the following output:
+
+$ sed -f conditional-branch.sed dukeofyork.txt 
+The grand old Duke of York
+He had ten thousand men
+He marched THEm UP to THE top of THE hill
+And he marched them down again              <--- replacement of 'the' was skipped over on this line alone
+And when THEy were UP THEy were UP
+And when THEy were down THEy were down
+And when THEy were only half-way UP
+They were neiTHEr UP nor down
+

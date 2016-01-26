@@ -3,6 +3,7 @@
 
 /abc/ matches abc
 
+
 @@
 2. ESCAPE CHARACTER \
 
@@ -11,6 +12,28 @@
 /a\\c/ maches 'a\c'
 
 /a\/c/ matches 'a/c'
+
+NOTE1: We need an escape character to escape the + sign which denotes multiple characters:
+
+$ sed 's/ \+/=/3'
+word1    word2  word3      word4
+word1    word2  word3=word4
+
+Without the \, sed would be looking for a pattern ' +' with a literal + character.
+
+NOTE2: We also need to escape parentheses if they denote capture groups in a
+regular expression:
+
+$ sed 's/\(\w\+\) \+\(\w\+\)/\2---\1/'
+one two three four five six
+two---one three four five six
+
+Without the \, sed would look for a literal match with characters ():
+
+$ sed 's/(\w\+)/<&>/g'
+one two (three) four (five) six
+one two <(three)> four <(five)> six
+
 
 @@
 3. BEGINNING/END OF LINE.
@@ -36,7 +59,8 @@
 
 /ab*c/ matches "ac", "abc", "abbbbbbbbbbc"
 
-REPEATING MULTIPLE ITEMS
+@@
+5. REPEATING MULTIPLE ITEMS
 
 /ab*c/  matches "abbbbbbc". The asterisk here refers to the 'b' character in the pattern.
 
@@ -47,7 +71,7 @@ REPEATING MULTIPLE ITEMS
 In other words, the asterisk refers to the sequence of characters in parentheses, 'ab'.
 
 @@
-5. GREEDINESS - USING THE ASTERISK
+6. GREEDINESS - USING THE ASTERISK
 
 /<.*>/ matches all of "<i>italic text</i>"
 
@@ -70,9 +94,8 @@ $ sed 's/[A-Z][a-z]*/(&)/g' dukeofyork.txt
 (And) when they were only half-way up
 (They) were neither up nor down
 
-
 @@
-7. BACKSLASH-NUMBER - REFERS TO AN INDIVIDUAL SUBSTRING IN A MATCH
+6. BACKSLASH-NUMBER - REFERS TO AN INDIVIDUAL SUBSTRING IN A MATCH
 
 sed 's/\([A-Za-z]*\) *\(up\)/<\1> <\2>/g' dukeofyork.txt 
        ^^---------^^  ^^--^^  ^^   ^^
@@ -93,4 +116,5 @@ And when they <were> <up> they <were> <up>
 And when they were down they were down
 And when they were only half-<way> <up>
 They were <neither> <up> nor down
+
 
